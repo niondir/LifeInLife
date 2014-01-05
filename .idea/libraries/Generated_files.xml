@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/Composite.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/VerletManager.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/DistanceConstraint.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/AngleConstraint.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/Frontend/app.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/app.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/Composite.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/VerletManager.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/DistanceConstraint.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/AngleConstraint.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

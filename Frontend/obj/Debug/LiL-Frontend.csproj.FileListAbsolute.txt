@@ -1,0 +1,5 @@
+D:\Daten\Projekte\LifeInLife\Frontend\bin\LiL-Frontend.dll
+D:\Daten\Projekte\LifeInLife\Frontend\bin\LiL-Frontend.pdb
+D:\Daten\Projekte\LifeInLife\Frontend\obj\Debug\LiL-Frontend.csprojResolveAssemblyReference.cache
+D:\Daten\Projekte\LifeInLife\Frontend\obj\Debug\LiL-Frontend.dll
+D:\Daten\Projekte\LifeInLife\Frontend\obj\Debug\LiL-Frontend.pdb

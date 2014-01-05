@@ -1,0 +1,11 @@
+{
+    "sources" : [
+        "./**/*ts"
+    ],
+    "compileOnSave": true,
+    
+    "target": "ES5",
+    "module": "AMD",
+    "outDir": "./bin/",
+    "noImplicitAny": true
+}
