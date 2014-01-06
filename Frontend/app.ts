@@ -33,7 +33,9 @@ module Game {
         private hud:Hud;
         cursor:Phaser.CursorKeys;
 
-        debug:Phaser.Utils.Debug;
+        public get debug() : Phaser.Utils.Debug {
+            return this.game.debug;
+        }
 
         mobiles:Array<Mobile> = [];
 
@@ -44,7 +46,6 @@ module Game {
         }
 
         preload() {
-            this.debug = this.game.debug;
             this.load.image('empty', 'sprites/empty.png');
             this.load.image('player', 'sprites/player.png');
             this.load.image('target', 'sprites/target.png');
