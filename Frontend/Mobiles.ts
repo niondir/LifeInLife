@@ -9,21 +9,19 @@ module Game {
     }
 
     export class Mobile implements IMobile {
-        Sprite:Phaser.Sprite;
+        public Sprite:Phaser.Sprite;
 
         update() {
-
         }
     }
 
 
     export class Player extends Mobile {
-        private state:PhaserGameState;
 
+        private state:PhaserGameState;
         private energyPerSec:number = 1;
 
         public inRange:number = 0;
-
         public energy:number = 10;
 
 
@@ -32,37 +30,57 @@ module Game {
             this.Sprite = state.add.sprite(x, y, 'player');
             this.Sprite.body.collideWorldBounds = true;
             this.state = state;
+
+
+
+            this.state.input.mouse.mouseDownCallback = <Function>((e) => this.mouseClick(e));
+        }
+
+        public mouseClick(event:MouseEvent) {
+            //this.bubbleText("LANG");
         }
 
         public update() {
             this.inRange = this.countInRange();
 
             var elapsedSec = this.state.time.elapsed / 1000;
-
-            this.energy += elapsedSec * this.energyGain;
-            this.energy = Math.max(0, this.energy);
-            /*
-            if (diff == 0) {
-
-                this.energyGain = this.energyPerSec;
-
-            }
-            else if (diff > 1) {
-                this.energyGain = -this.energyPerSec;
-                this.energy -= elapsedSec * this.energyPerSec;
-
-                this.energy = Math.max(0, this.energy);
-            }*/
+            this.gainEnergy(elapsedSec);
         }
 
-        public get energyGain():number {
+        private gainEnergy(elapsedSec:number) {
+            var old = this.energy;
+            this.energy += elapsedSec * this.energyGainPerSec;
+            this.energy = Math.max(0, this.energy);
+
+            if (Math.floor(this.energy) < Math.floor(old)) {
+                this.bubbleText("-1");
+            }
+
+            if (Math.floor(this.energy) > Math.floor(old)) {
+                this.bubbleText("+1");
+            }
+        }
+
+        public bubbleText(msg:string) {
+            var body = this.Sprite.body;
+
+
+            var text = this.state.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
+            var tween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
+            this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
+
+            // TODO: Better destroy
+            tween.onComplete.addOnce(() => {text.visible = false;});
+        }
+
+        public get energyGainPerSec():number {
             var optimal = 3;
             var diff = Math.abs(optimal - this.inRange);
 
-            if (diff == 0 )
+            if (diff == 0)
                 return this.energyPerSec;
-            else if (diff > 1 ) {
-                return -this.energyPerSec;;
+            else if (diff > 1) {
+                return -this.energyPerSec;
             }
             return 0;
 
@@ -98,8 +116,6 @@ module Game {
 
             this.Sprite = state.add.sprite(x, y, 'target');
             this.Sprite.body.collideWorldBounds = true;
-            //this.Sprite.body.acceleration.x = this.state.game.rnd.frac() * 10;
-            //this.Sprite.body.acceleration.y = this.state.game.rnd.frac() * 10;
             this.Sprite.body.velocity.x = this.state.game.rnd.frac() * 100;
             this.Sprite.body.velocity.y = this.state.game.rnd.frac() * 100;
             this.Sprite.body.bounce.setTo(1, 1);
@@ -140,13 +156,13 @@ module Game {
             this.emitterYellow.on = false;
             this.emitterGreen.on = false;
 
-            if (this.state.player.energyGain > 0) {
+            if (this.state.player.energyGainPerSec > 0) {
                 this.emitterGreen.on = inRange;
             }
-            if (this.state.player.energyGain == 0) {
+            if (this.state.player.energyGainPerSec == 0) {
                 this.emitterYellow.on = inRange;
             }
-            if (this.state.player.energyGain < 0) {
+            if (this.state.player.energyGainPerSec < 0) {
                 this.emitterRed.on = inRange;
             }
 

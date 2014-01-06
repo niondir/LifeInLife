@@ -1,3 +1,5 @@
+
+
 declare class Phaser {
     static VERSION: string;
     static DEV_VERSION: string;
@@ -22,7 +24,28 @@ declare class Phaser {
     static WEBGL_FILTER: number;
 }
 
+/*
+declare var PIXI: any;
+
+declare module PIXI {
+
+    class DisplayObject {
+        public position:  PIXI.Point;
+
+    }
+
+    /x**
+     * The Point object represents a location in a two-dimensional coordinate system, where x represents the horizontal axis and y represents the vertical axis.
+     *x/
+    class Point {
+        public x:number = 0;
+        public y:number = 0;
+    }
+}
+*/
 declare module Phaser {
+
+
     class Camera {
         constructor(game: Phaser.Game, id: number, x: number, y: number, width: number, height: number);
         game: Phaser.Game;
@@ -517,9 +540,9 @@ declare module Phaser {
         static LEFT_BUTTON: number;
         static MIDDLE_BUTTON: number;
         static RIGHT_BUTTON: number;
-        mouseDownCallback(): void;
-        mouseMoveCallback(): void;
-        mouseUpCallback(): void;
+        mouseDownCallback: Function;
+        mouseMoveCallback: Function;
+        mouseUpCallback: Function;
         start(): void;
         onMouseDown(): void;
         onMouseUp(): void;
@@ -699,7 +722,7 @@ declare module Phaser {
         button(x: number, y: number, key: string, callback: Function, callbackContext: Object, overFrame?: any, outFrame?: any, downFrame?: any): Phaser.Button;
         graphics(x: number, y: number): Phaser.Graphics;
         emitter(x: number, y: number, maxParticles: number): Phaser.Particles.Arcade.Emitter;
-        bitmapText(x: number, y: number, text: string, style: string): Phaser.BitmapText;
+        bitmapText(x: number, y: number, text: string, style: any): Phaser.BitmapText;
         tilemap(x: number, y: number, key: string, resizeWorld: boolean, tileWidth: number, tileHeight: number): Phaser.Tilemap;
         renderTexture(key: string, width: number, height: number): Phaser.RenderTexture;
     }

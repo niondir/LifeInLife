@@ -39,6 +39,8 @@ module Game {
 
         mobiles:Array<Mobile> = [];
 
+        npcs:Phaser.Group;
+
         cameraAnchor:Phaser.Sprite;
 
         constructor() {
@@ -46,6 +48,9 @@ module Game {
         }
 
         preload() {
+            this.load.bitmapFont("lucky_day", 'fonts/lucky_day.png', 'fonts/lucky_day.xml'); // Lucky_Day
+            this.load.bitmapFont('desyrel', 'fonts/desyrel.png', 'fonts/desyrel.xml'); // Desyrel
+
             this.load.image('empty', 'sprites/empty.png');
             this.load.image('player', 'sprites/player.png');
             this.load.image('target', 'sprites/target.png');
@@ -53,11 +58,18 @@ module Game {
             this.load.image('energy_red', 'sprites/energy_red.png');
             this.load.image('energy_yellow', 'sprites/energy_yellow.png');
             this.load.image('energy_green', 'sprites/energy_green.png');
+
         }
 
         create() {
+
+
             this.cameraAnchor = this.add.sprite(0, 0, 'empty');
             this.cameraAnchor.fixedToCamera = true;
+
+
+
+//{ font: '64px desyrel', align: 'center' }
 
             this.hud = new Hud(this);
 
@@ -65,8 +77,10 @@ module Game {
 
             this.world.setBounds(0, 0, 2000, 2000);
 
+            this.npcs = new Phaser.Group(this.game, null, "npc's", false);
             for (var i = 0; i < 100; i++) {
                 var npc = new Npc(this.world.randomX, this.world.randomY, this);
+                //this.npcs.add(npc.Sprite);
                 this.mobiles.push(<Mobile>npc);
             }
 
@@ -89,7 +103,6 @@ module Game {
         update() {
             var playerSprite = this.player.Sprite;
 
-            playerSprite.body.rotation += 0.01;
             playerSprite.body.velocity.x = 0;
             playerSprite.body.velocity.y = 0;
 
@@ -136,8 +149,10 @@ module Game {
 
             //renderText(text: string, x: number, y: number, color?: string, font?: string): void;
             // this.debug.renderText(text, 10, 10, 'black', '14px Arial');
-            //this.game.debug.renderSpriteCorners(this.player, true, true);
-            //this.game.debug.renderSpriteInfo(this.player, 20, 32);
+
+            //this.game.debug.renderSpriteCorners(this.player.Sprite, false, true);
+            //this.game.debug.renderSpriteInfo(this.player.Sprite, 20, 32);
+
 
 
         }

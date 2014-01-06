@@ -101,171 +101,17 @@ var Events;
     })();
     Events.KeyboardHandler = KeyboardHandler;
 })(Events || (Events = {}));
+///<reference path="Events.ts"/>
+///<reference path="Keyboard.ts"/>
+///<reference path="Mobiles.ts"/>
+///<reference path="endgate/endgate-0.2.1.d.ts"/>
+///<reference path="phaser/phaser.d.ts"/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-///<reference path="phaser/phaser.d.ts"/>
-///<reference path="app.ts"/>
-var Game;
-(function (Game) {
-    var Mobile = (function () {
-        function Mobile() {
-        }
-        Mobile.prototype.update = function () {
-        };
-        return Mobile;
-    })();
-    Game.Mobile = Mobile;
-
-    var Player = (function (_super) {
-        __extends(Player, _super);
-        function Player(x, y, state) {
-            _super.call(this);
-            this.energyPerSec = 1;
-            this.inRange = 0;
-            this.energy = 10;
-            this.Sprite = state.add.sprite(x, y, 'player');
-            this.Sprite.body.collideWorldBounds = true;
-            this.state = state;
-        }
-        Player.prototype.update = function () {
-            this.inRange = this.countInRange();
-
-            var elapsedSec = this.state.time.elapsed / 1000;
-
-            this.energy += elapsedSec * this.energyGain;
-            this.energy = Math.max(0, this.energy);
-            /*
-            if (diff == 0) {
-            
-            this.energyGain = this.energyPerSec;
-            
-            }
-            else if (diff > 1) {
-            this.energyGain = -this.energyPerSec;
-            this.energy -= elapsedSec * this.energyPerSec;
-            
-            this.energy = Math.max(0, this.energy);
-            }*/
-        };
-
-        Object.defineProperty(Player.prototype, "energyGain", {
-            get: function () {
-                var optimal = 3;
-                var diff = Math.abs(optimal - this.inRange);
-
-                if (diff == 0)
-                    return this.energyPerSec;
-                else if (diff > 1) {
-                    return -this.energyPerSec;
-                    ;
-                }
-                return 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
-
-        Player.prototype.countInRange = function () {
-            var player = this.state.player.Sprite.center;
-            var count = 0;
-            for (var i in this.state.mobiles) {
-                var mob = this.state.mobiles[i].Sprite.center;
-
-                var dist = Phaser.Math.distance(player.x, player.y, mob.x, mob.y);
-                if (mob != player && dist < 100) {
-                    count++;
-                }
-            }
-            return count;
-        };
-        return Player;
-    })(Mobile);
-    Game.Player = Player;
-
-    var Npc = (function (_super) {
-        __extends(Npc, _super);
-        function Npc(x, y, state) {
-            _super.call(this);
-            this.state = state;
-
-            this.Sprite = state.add.sprite(x, y, 'target');
-            this.Sprite.body.collideWorldBounds = true;
-
-            //this.Sprite.body.acceleration.x = this.state.game.rnd.frac() * 10;
-            //this.Sprite.body.acceleration.y = this.state.game.rnd.frac() * 10;
-            this.Sprite.body.velocity.x = this.state.game.rnd.frac() * 100;
-            this.Sprite.body.velocity.y = this.state.game.rnd.frac() * 100;
-            this.Sprite.body.bounce.setTo(1, 1);
-
-            this.emitterGreen = this.buildEmitter('energy_green');
-            this.emitterYellow = this.buildEmitter('energy_yellow');
-            this.emitterRed = this.buildEmitter('energy_red');
-        }
-        Npc.prototype.buildEmitter = function (sprite) {
-            var emitter = this.state.add.emitter(this.Sprite.x, this.Sprite.y, 100);
-            emitter.gravity = 0;
-
-            //keys: string[], frames: string[], quantity: number, collide: boolean, collideWorldBounds: boolean
-            emitter.makeParticles([sprite], [], 2, false, false);
-            emitter.x = this.Sprite.x;
-            emitter.y = this.Sprite.y;
-            emitter.minParticleScale = 2;
-            emitter.maxParticleScale = 2;
-            emitter.start(false, 2000, 100, 0);
-            emitter.on = false;
-            return emitter;
-        };
-
-        Npc.prototype.update = function () {
-            this.emitterRed.x = this.Sprite.x;
-            this.emitterRed.y = this.Sprite.y;
-            this.emitterYellow.x = this.Sprite.x;
-            this.emitterYellow.y = this.Sprite.y;
-            this.emitterGreen.x = this.Sprite.x;
-            this.emitterGreen.y = this.Sprite.y;
-
-            var inRange = this.state.physics.distanceBetween(this.Sprite, this.state.player.Sprite) < 100;
-
-            this.emitterRed.on = false;
-            this.emitterYellow.on = false;
-            this.emitterGreen.on = false;
-
-            if (this.state.player.energyGain > 0) {
-                this.emitterGreen.on = inRange;
-            }
-            if (this.state.player.energyGain == 0) {
-                this.emitterYellow.on = inRange;
-            }
-            if (this.state.player.energyGain < 0) {
-                this.emitterRed.on = inRange;
-            }
-
-            this.emitterRed.forEach(this.moveTo, this, false);
-            this.emitterYellow.forEach(this.moveTo, this, false);
-            this.emitterGreen.forEach(this.moveTo, this, false);
-        };
-
-        Npc.prototype.moveTo = function (sprite) {
-            if (this.state.physics.distanceBetween(sprite, this.state.player.Sprite) < 10) {
-                sprite.kill();
-                return;
-            }
-
-            this.state.physics.moveToObject(sprite, this.state.player.Sprite, 500);
-        };
-        return Npc;
-    })(Mobile);
-    Game.Npc = Npc;
-})(Game || (Game = {}));
-///<reference path="Events.ts"/>
-///<reference path="Keyboard.ts"/>
-///<reference path="Mobiles.ts"/>
-///<reference path="endgate/endgate-0.2.1.d.ts"/>
-///<reference path="phaser/phaser.d.ts"/>
 window.onload = function () {
     var el = document.getElementById('gameCanvas');
 
@@ -299,6 +145,9 @@ var Game;
         });
 
         PhaserGameState.prototype.preload = function () {
+            this.load.bitmapFont("lucky_day", 'fonts/lucky_day.png', 'fonts/lucky_day.xml'); // Lucky_Day
+            this.load.bitmapFont('desyrel', 'fonts/desyrel.png', 'fonts/desyrel.xml'); // Desyrel
+
             this.load.image('empty', 'sprites/empty.png');
             this.load.image('player', 'sprites/player.png');
             this.load.image('target', 'sprites/target.png');
@@ -312,14 +161,18 @@ var Game;
             this.cameraAnchor = this.add.sprite(0, 0, 'empty');
             this.cameraAnchor.fixedToCamera = true;
 
+            //{ font: '64px desyrel', align: 'center' }
             this.hud = new Hud(this);
 
             this.cursor = this.input.keyboard.createCursorKeys();
 
             this.world.setBounds(0, 0, 2000, 2000);
 
+            this.npcs = new Phaser.Group(this.game, null, "npc's", false);
             for (var i = 0; i < 100; i++) {
                 var npc = new Game.Npc(this.world.randomX, this.world.randomY, this);
+
+                //this.npcs.add(npc.Sprite);
                 this.mobiles.push(npc);
             }
 
@@ -341,7 +194,6 @@ var Game;
         PhaserGameState.prototype.update = function () {
             var playerSprite = this.player.Sprite;
 
-            playerSprite.body.rotation += 0.01;
             playerSprite.body.velocity.x = 0;
             playerSprite.body.velocity.y = 0;
 
@@ -377,8 +229,8 @@ var Game;
             // var style = { font: "14px Arial", fill: "#ff0044", align: "center" };
             //renderText(text: string, x: number, y: number, color?: string, font?: string): void;
             // this.debug.renderText(text, 10, 10, 'black', '14px Arial');
-            //this.game.debug.renderSpriteCorners(this.player, true, true);
-            //this.game.debug.renderSpriteInfo(this.player, 20, 32);
+            //this.game.debug.renderSpriteCorners(this.player.Sprite, false, true);
+            //this.game.debug.renderSpriteInfo(this.player.Sprite, 20, 32);
         };
         return PhaserGameState;
     })(Phaser.State);
@@ -433,5 +285,177 @@ var Game;
         Target._targetBodyColor = EndGate.Graphics.Color.Transparent;
         return Target;
     })(EndGate.Collision.Collidable);
+})(Game || (Game = {}));
+///<reference path="phaser/phaser.d.ts"/>
+///<reference path="app.ts"/>
+var Game;
+(function (Game) {
+    var Mobile = (function () {
+        function Mobile() {
+        }
+        Mobile.prototype.update = function () {
+        };
+        return Mobile;
+    })();
+    Game.Mobile = Mobile;
+
+    var Player = (function (_super) {
+        __extends(Player, _super);
+        function Player(x, y, state) {
+            var _this = this;
+            _super.call(this);
+            this.energyPerSec = 1;
+            this.inRange = 0;
+            this.energy = 10;
+            this.Sprite = state.add.sprite(x, y, 'player');
+            this.Sprite.body.collideWorldBounds = true;
+            this.state = state;
+
+            this.state.input.mouse.mouseDownCallback = (function (e) {
+                return _this.mouseClick(e);
+            });
+        }
+        Player.prototype.mouseClick = function (event) {
+            //this.bubbleText("LANG");
+        };
+
+        Player.prototype.update = function () {
+            this.inRange = this.countInRange();
+
+            var elapsedSec = this.state.time.elapsed / 1000;
+            this.gainEnergy(elapsedSec);
+        };
+
+        Player.prototype.gainEnergy = function (elapsedSec) {
+            var old = this.energy;
+            this.energy += elapsedSec * this.energyGainPerSec;
+            this.energy = Math.max(0, this.energy);
+
+            if (Math.floor(this.energy) < Math.floor(old)) {
+                this.bubbleText("-1");
+            }
+
+            if (Math.floor(this.energy) > Math.floor(old)) {
+                this.bubbleText("+1");
+            }
+        };
+
+        Player.prototype.bubbleText = function (msg) {
+            var body = this.Sprite.body;
+
+            var text = this.state.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
+            var tween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
+            this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
+
+            // TODO: Better destroy
+            tween.onComplete.addOnce(function () {
+                text.visible = false;
+            });
+        };
+
+        Object.defineProperty(Player.prototype, "energyGainPerSec", {
+            get: function () {
+                var optimal = 3;
+                var diff = Math.abs(optimal - this.inRange);
+
+                if (diff == 0)
+                    return this.energyPerSec;
+                else if (diff > 1) {
+                    return -this.energyPerSec;
+                }
+                return 0;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Player.prototype.countInRange = function () {
+            var player = this.state.player.Sprite.center;
+            var count = 0;
+            for (var i in this.state.mobiles) {
+                var mob = this.state.mobiles[i].Sprite.center;
+
+                var dist = Phaser.Math.distance(player.x, player.y, mob.x, mob.y);
+                if (mob != player && dist < 100) {
+                    count++;
+                }
+            }
+            return count;
+        };
+        return Player;
+    })(Mobile);
+    Game.Player = Player;
+
+    var Npc = (function (_super) {
+        __extends(Npc, _super);
+        function Npc(x, y, state) {
+            _super.call(this);
+            this.state = state;
+
+            this.Sprite = state.add.sprite(x, y, 'target');
+            this.Sprite.body.collideWorldBounds = true;
+            this.Sprite.body.velocity.x = this.state.game.rnd.frac() * 100;
+            this.Sprite.body.velocity.y = this.state.game.rnd.frac() * 100;
+            this.Sprite.body.bounce.setTo(1, 1);
+
+            this.emitterGreen = this.buildEmitter('energy_green');
+            this.emitterYellow = this.buildEmitter('energy_yellow');
+            this.emitterRed = this.buildEmitter('energy_red');
+        }
+        Npc.prototype.buildEmitter = function (sprite) {
+            var emitter = this.state.add.emitter(this.Sprite.x, this.Sprite.y, 100);
+            emitter.gravity = 0;
+
+            //keys: string[], frames: string[], quantity: number, collide: boolean, collideWorldBounds: boolean
+            emitter.makeParticles([sprite], [], 2, false, false);
+            emitter.x = this.Sprite.x;
+            emitter.y = this.Sprite.y;
+            emitter.minParticleScale = 2;
+            emitter.maxParticleScale = 2;
+            emitter.start(false, 2000, 100, 0);
+            emitter.on = false;
+            return emitter;
+        };
+
+        Npc.prototype.update = function () {
+            this.emitterRed.x = this.Sprite.x;
+            this.emitterRed.y = this.Sprite.y;
+            this.emitterYellow.x = this.Sprite.x;
+            this.emitterYellow.y = this.Sprite.y;
+            this.emitterGreen.x = this.Sprite.x;
+            this.emitterGreen.y = this.Sprite.y;
+
+            var inRange = this.state.physics.distanceBetween(this.Sprite, this.state.player.Sprite) < 100;
+
+            this.emitterRed.on = false;
+            this.emitterYellow.on = false;
+            this.emitterGreen.on = false;
+
+            if (this.state.player.energyGainPerSec > 0) {
+                this.emitterGreen.on = inRange;
+            }
+            if (this.state.player.energyGainPerSec == 0) {
+                this.emitterYellow.on = inRange;
+            }
+            if (this.state.player.energyGainPerSec < 0) {
+                this.emitterRed.on = inRange;
+            }
+
+            this.emitterRed.forEach(this.moveTo, this, false);
+            this.emitterYellow.forEach(this.moveTo, this, false);
+            this.emitterGreen.forEach(this.moveTo, this, false);
+        };
+
+        Npc.prototype.moveTo = function (sprite) {
+            if (this.state.physics.distanceBetween(sprite, this.state.player.Sprite) < 10) {
+                sprite.kill();
+                return;
+            }
+
+            this.state.physics.moveToObject(sprite, this.state.player.Sprite, 500);
+        };
+        return Npc;
+    })(Mobile);
+    Game.Npc = Npc;
 })(Game || (Game = {}));
 //# sourceMappingURL=final.js.map
