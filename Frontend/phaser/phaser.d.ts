@@ -283,7 +283,7 @@ declare module Phaser {
     }
 
     class Game {
-        constructor(width: number, height: number, renderer: number, parent: string, state: Object, transparent?: boolean, antialias?: boolean);
+        constructor(width?: number, height?: number, renderer?: number, parent?: string, state?: Object, transparent?: boolean, antialias?: boolean);
         id: number;
         width: number;
         height: number;
