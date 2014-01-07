@@ -220,7 +220,7 @@ declare module Phaser {
     }
 
     class Group {
-        constructor(game: Phaser.Game, parent: any, name: string, useStage: boolean);
+        constructor(game: Phaser.Game, parent?: any, name?: string, useStage?: boolean);
         game: Phaser.Game;
         name: string;
         type: number;
@@ -263,7 +263,7 @@ declare module Phaser {
         dump(full: boolean): void;
     }
 
-    class World {
+    class World extends Phaser.Group {
         constructor(game: Phaser.Game);
         game: Phaser.Game;
         bounds: Phaser.Rectangle;
@@ -283,6 +283,16 @@ declare module Phaser {
     }
 
     class Game {
+        /*
+         * Defaults:
+         * [width=800] - The width of your game in game pixels.
+         * [height=600] - The height of your game in game pixels.
+         * [renderer=Phaser.AUTO] - Which renderer to use: Phaser.AUTO will auto-detect, Phaser.WEBGL, Phaser.CANVAS or Phaser.HEADLESS (no rendering at all).
+         * [parent=''] - The Games DOM parent.
+         * [state=null] - Description.
+         * [transparent=false] - Use a transparent canvas background or not.
+         * [antialias=true] - Anti-alias graphics.
+         * */
         constructor(width?: number, height?: number, renderer?: number, parent?: string, state?: Object, transparent?: boolean, antialias?: boolean);
         id: number;
         width: number;

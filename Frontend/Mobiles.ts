@@ -64,13 +64,11 @@ module Game {
         public bubbleText(msg:string) {
             var body = this.Sprite.body;
 
-
             var text = this.state.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
-            var tween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
-            this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
+            var moveTween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
+            var hideTween = this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
 
-            // TODO: Better destroy
-            tween.onComplete.addOnce(() => {text.visible = false;});
+            hideTween.onComplete.addOnce(() => {this.state.world.remove(text)});
         }
 
         public get energyGainPerSec():number {
@@ -83,7 +81,6 @@ module Game {
                 return -this.energyPerSec;
             }
             return 0;
-
         }
 
         private countInRange():number {
@@ -96,7 +93,6 @@ module Game {
                 if (mob != player && dist < 100) {
                     count++;
                 }
-
             }
             return count;
         }

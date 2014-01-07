@@ -17,11 +17,16 @@ module Game {
 
         constructor() {
             var state = new PhaserGameState();
-            this.game = new Phaser.Game(800, 600, Phaser.CANVAS, 'content',
-                state,
-                true, // transparent
-                true); // antialias
+            this.game = new LifeInLifeGame();
 
+        }
+
+    }
+
+    export class LifeInLifeGame extends Phaser.Game {
+        constructor() {
+            super(800, 600, Phaser.CANVAS, 'content', null, true, true);
+            this.state.add("Main", new PhaserGameState(), true);
         }
 
     }
@@ -33,7 +38,7 @@ module Game {
         private hud:Hud;
         cursor:Phaser.CursorKeys;
 
-        public get debug() : Phaser.Utils.Debug {
+        public get debug():Phaser.Utils.Debug {
             return this.game.debug;
         }
 
@@ -58,29 +63,25 @@ module Game {
             this.load.image('energy_red', 'sprites/energy_red.png');
             this.load.image('energy_yellow', 'sprites/energy_yellow.png');
             this.load.image('energy_green', 'sprites/energy_green.png');
+            this.load.image('energy_bar', 'sprites/energy_bar.png');
 
         }
 
         create() {
-
-
             this.cameraAnchor = this.add.sprite(0, 0, 'empty');
             this.cameraAnchor.fixedToCamera = true;
 
-
-
-//{ font: '64px desyrel', align: 'center' }
-
-            this.hud = new Hud(this);
+            this.hud = new Hud(this.game, this);
 
             this.cursor = this.input.keyboard.createCursorKeys();
 
             this.world.setBounds(0, 0, 2000, 2000);
 
-            this.npcs = new Phaser.Group(this.game, null, "npc's", false);
+            this.npcs = new Phaser.Group(this.game, this.world, "npc's", false);
+
             for (var i = 0; i < 100; i++) {
                 var npc = new Npc(this.world.randomX, this.world.randomY, this);
-                //this.npcs.add(npc.Sprite);
+                this.npcs.add(npc.Sprite);
                 this.mobiles.push(<Mobile>npc);
             }
 
@@ -134,7 +135,7 @@ module Game {
              this.game.input.mousePointer.reset();
              }
              */
-            for(var i in this.mobiles) {
+            for (var i in this.mobiles) {
                 this.mobiles[i].update();
             }
 
@@ -154,16 +155,18 @@ module Game {
             //this.game.debug.renderSpriteInfo(this.player.Sprite, 20, 32);
 
 
-
         }
 
 
     }
 
-    class Hud {
+    class Hud extends Phaser.Group {
+
         state:PhaserGameState;
 
-        constructor(state:PhaserGameState) {
+        constructor(game: Phaser.Game, state:PhaserGameState) {
+            super(game, game.world, "Hud");
+
             this.state = state;
         }
 
@@ -177,7 +180,6 @@ module Game {
             var text = "Energy: " + Phaser.Math.roundTo(this.state.player.energy, -2).toString();
             this.state.debug.renderText(text, 100, 10, 'black', '14px Arial');
         }
-
 
 
     }

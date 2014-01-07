@@ -101,191 +101,12 @@ var Events;
     })();
     Events.KeyboardHandler = KeyboardHandler;
 })(Events || (Events = {}));
-///<reference path="Events.ts"/>
-///<reference path="Keyboard.ts"/>
-///<reference path="Mobiles.ts"/>
-///<reference path="endgate/endgate-0.2.1.d.ts"/>
-///<reference path="phaser/phaser.d.ts"/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-window.onload = function () {
-    var el = document.getElementById('gameCanvas');
-
-    //var game = new Game.LifeInLife(<HTMLCanvasElement>el);
-    var game = new Game.PhaserGame();
-};
-
-var Game;
-(function (Game) {
-    var PhaserGame = (function () {
-        function PhaserGame() {
-            var state = new PhaserGameState();
-            this.game = new Phaser.Game(800, 600, Phaser.CANVAS, 'content', state, true, true); // antialias
-        }
-        return PhaserGame;
-    })();
-    Game.PhaserGame = PhaserGame;
-
-    var PhaserGameState = (function (_super) {
-        __extends(PhaserGameState, _super);
-        function PhaserGameState() {
-            _super.call(this);
-            this.mobiles = [];
-        }
-        Object.defineProperty(PhaserGameState.prototype, "debug", {
-            get: function () {
-                return this.game.debug;
-            },
-            enumerable: true,
-            configurable: true
-        });
-
-        PhaserGameState.prototype.preload = function () {
-            this.load.bitmapFont("lucky_day", 'fonts/lucky_day.png', 'fonts/lucky_day.xml'); // Lucky_Day
-            this.load.bitmapFont('desyrel', 'fonts/desyrel.png', 'fonts/desyrel.xml'); // Desyrel
-
-            this.load.image('empty', 'sprites/empty.png');
-            this.load.image('player', 'sprites/player.png');
-            this.load.image('target', 'sprites/target.png');
-            this.load.image('energy', 'sprites/energy.png');
-            this.load.image('energy_red', 'sprites/energy_red.png');
-            this.load.image('energy_yellow', 'sprites/energy_yellow.png');
-            this.load.image('energy_green', 'sprites/energy_green.png');
-        };
-
-        PhaserGameState.prototype.create = function () {
-            this.cameraAnchor = this.add.sprite(0, 0, 'empty');
-            this.cameraAnchor.fixedToCamera = true;
-
-            //{ font: '64px desyrel', align: 'center' }
-            this.hud = new Hud(this);
-
-            this.cursor = this.input.keyboard.createCursorKeys();
-
-            this.world.setBounds(0, 0, 2000, 2000);
-
-            this.npcs = new Phaser.Group(this.game, null, "npc's", false);
-            for (var i = 0; i < 100; i++) {
-                var npc = new Game.Npc(this.world.randomX, this.world.randomY, this);
-
-                //this.npcs.add(npc.Sprite);
-                this.mobiles.push(npc);
-            }
-
-            //  Stop the following keys from propagating up to the browser
-            this.input.keyboard.addKeyCapture([
-                Phaser.Keyboard.LEFT,
-                Phaser.Keyboard.RIGHT,
-                Phaser.Keyboard.UP,
-                Phaser.Keyboard.DOWN,
-                Phaser.Keyboard.SPACEBAR]);
-
-            var player = new Game.Player(this.world.centerX, this.world.centerY, this);
-            this.player = player;
-            this.mobiles.push(player);
-
-            this.camera.follow(this.player.Sprite, Phaser.Camera.FOLLOW_PLATFORMER);
-        };
-
-        PhaserGameState.prototype.update = function () {
-            var playerSprite = this.player.Sprite;
-
-            playerSprite.body.velocity.x = 0;
-            playerSprite.body.velocity.y = 0;
-
-            if (this.cursor.left.isDown) {
-                playerSprite.body.velocity.x = -200;
-            }
-
-            if (this.cursor.right.isDown) {
-                playerSprite.body.velocity.x = 200;
-            }
-
-            if (this.cursor.up.isDown) {
-                playerSprite.body.velocity.y = -200;
-            }
-
-            if (this.cursor.down.isDown) {
-                playerSprite.body.velocity.y = 200;
-            }
-
-            if (this.input.keyboard.isDown(Phaser.Keyboard.PAGE_DOWN)) {
-            }
-
-            for (var i in this.mobiles) {
-                this.mobiles[i].update();
-            }
-
-            this.hud.update();
-        };
-
-        PhaserGameState.prototype.render = function () {
-            this.hud.render();
-            //var text = "Energy: ";
-            // var style = { font: "14px Arial", fill: "#ff0044", align: "center" };
-            //renderText(text: string, x: number, y: number, color?: string, font?: string): void;
-            // this.debug.renderText(text, 10, 10, 'black', '14px Arial');
-            //this.game.debug.renderSpriteCorners(this.player.Sprite, false, true);
-            //this.game.debug.renderSpriteInfo(this.player.Sprite, 20, 32);
-        };
-        return PhaserGameState;
-    })(Phaser.State);
-    Game.PhaserGameState = PhaserGameState;
-
-    var Hud = (function () {
-        function Hud(state) {
-            this.state = state;
-        }
-        Hud.prototype.update = function () {
-        };
-
-        Hud.prototype.render = function () {
-            var text = "In Range: " + Phaser.Math.roundTo(this.state.player.inRange).toString();
-            this.state.debug.renderText(text, 10, 10, 'black', '14px Arial');
-
-            var text = "Energy: " + Phaser.Math.roundTo(this.state.player.energy, -2).toString();
-            this.state.debug.renderText(text, 100, 10, 'black', '14px Arial');
-        };
-        return Hud;
-    })();
-
-    var Target = (function (_super) {
-        __extends(Target, _super);
-        function Target(x, y) {
-            this.Graphic = new EndGate.Graphics.Circle(x, y, Target._targetRadius, Target._targetBodyColor);
-
-            _super.call(this, this.Graphic.GetDrawBounds());
-
-            // Make a border around our base graphic
-            this.Graphic.Border(5, Target._targetColor);
-
-            // Add a vertical rectangle to the base graphic
-            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 5, 40, Target._targetColor));
-
-            // Add a horizontal rectangle to the base graphic
-            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 40, 5, Target._targetColor));
-        }
-        Target.prototype.Collided = function (data) {
-            // We cannot collide with other targets because all targets have static positions.  Adding a collidable with a static position to the
-            // CollisionManager will optimize collision detection AND prevent other static collidables from colliding with each other.
-            // Will remove the target from the collision manager
-            this.Dispose();
-
-            // Will remove the target from the scene (will no longer be drawn)
-            this.Graphic.Dispose();
-
-            _super.prototype.Collided.call(this, data);
-        };
-        Target._targetRadius = 30;
-        Target._targetColor = EndGate.Graphics.Color.Green;
-        Target._targetBodyColor = EndGate.Graphics.Color.Transparent;
-        return Target;
-    })(EndGate.Collision.Collidable);
-})(Game || (Game = {}));
 ///<reference path="phaser/phaser.d.ts"/>
 ///<reference path="app.ts"/>
 var Game;
@@ -341,15 +162,15 @@ var Game;
         };
 
         Player.prototype.bubbleText = function (msg) {
+            var _this = this;
             var body = this.Sprite.body;
 
             var text = this.state.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
-            var tween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
-            this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
+            var moveTween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
+            var hideTween = this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
 
-            // TODO: Better destroy
-            tween.onComplete.addOnce(function () {
-                text.visible = false;
+            hideTween.onComplete.addOnce(function () {
+                _this.state.world.remove(text);
             });
         };
 
@@ -457,5 +278,197 @@ var Game;
         return Npc;
     })(Mobile);
     Game.Npc = Npc;
+})(Game || (Game = {}));
+///<reference path="Events.ts"/>
+///<reference path="Keyboard.ts"/>
+///<reference path="Mobiles.ts"/>
+///<reference path="endgate/endgate-0.2.1.d.ts"/>
+///<reference path="phaser/phaser.d.ts"/>
+window.onload = function () {
+    var el = document.getElementById('gameCanvas');
+
+    //var game = new Game.LifeInLife(<HTMLCanvasElement>el);
+    var game = new Game.PhaserGame();
+};
+
+var Game;
+(function (Game) {
+    var PhaserGame = (function () {
+        function PhaserGame() {
+            var state = new PhaserGameState();
+            this.game = new LifeInLifeGame();
+        }
+        return PhaserGame;
+    })();
+    Game.PhaserGame = PhaserGame;
+
+    var LifeInLifeGame = (function (_super) {
+        __extends(LifeInLifeGame, _super);
+        function LifeInLifeGame() {
+            _super.call(this, 800, 600, Phaser.CANVAS, 'content', null, true, true);
+            this.state.add("Main", new PhaserGameState(), true);
+        }
+        return LifeInLifeGame;
+    })(Phaser.Game);
+    Game.LifeInLifeGame = LifeInLifeGame;
+
+    var PhaserGameState = (function (_super) {
+        __extends(PhaserGameState, _super);
+        function PhaserGameState() {
+            _super.call(this);
+            this.mobiles = [];
+        }
+        Object.defineProperty(PhaserGameState.prototype, "debug", {
+            get: function () {
+                return this.game.debug;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        PhaserGameState.prototype.preload = function () {
+            this.load.bitmapFont("lucky_day", 'fonts/lucky_day.png', 'fonts/lucky_day.xml'); // Lucky_Day
+            this.load.bitmapFont('desyrel', 'fonts/desyrel.png', 'fonts/desyrel.xml'); // Desyrel
+
+            this.load.image('empty', 'sprites/empty.png');
+            this.load.image('player', 'sprites/player.png');
+            this.load.image('target', 'sprites/target.png');
+            this.load.image('energy', 'sprites/energy.png');
+            this.load.image('energy_red', 'sprites/energy_red.png');
+            this.load.image('energy_yellow', 'sprites/energy_yellow.png');
+            this.load.image('energy_green', 'sprites/energy_green.png');
+            this.load.image('energy_bar', 'sprites/energy_bar.png');
+        };
+
+        PhaserGameState.prototype.create = function () {
+            this.cameraAnchor = this.add.sprite(0, 0, 'empty');
+            this.cameraAnchor.fixedToCamera = true;
+
+            this.hud = new Hud(this.game, this);
+
+            this.cursor = this.input.keyboard.createCursorKeys();
+
+            this.world.setBounds(0, 0, 2000, 2000);
+
+            this.npcs = new Phaser.Group(this.game, this.world, "npc's", false);
+
+            for (var i = 0; i < 100; i++) {
+                var npc = new Game.Npc(this.world.randomX, this.world.randomY, this);
+                this.npcs.add(npc.Sprite);
+                this.mobiles.push(npc);
+            }
+
+            //  Stop the following keys from propagating up to the browser
+            this.input.keyboard.addKeyCapture([
+                Phaser.Keyboard.LEFT,
+                Phaser.Keyboard.RIGHT,
+                Phaser.Keyboard.UP,
+                Phaser.Keyboard.DOWN,
+                Phaser.Keyboard.SPACEBAR]);
+
+            var player = new Game.Player(this.world.centerX, this.world.centerY, this);
+            this.player = player;
+            this.mobiles.push(player);
+
+            this.camera.follow(this.player.Sprite, Phaser.Camera.FOLLOW_PLATFORMER);
+        };
+
+        PhaserGameState.prototype.update = function () {
+            var playerSprite = this.player.Sprite;
+
+            playerSprite.body.velocity.x = 0;
+            playerSprite.body.velocity.y = 0;
+
+            if (this.cursor.left.isDown) {
+                playerSprite.body.velocity.x = -200;
+            }
+
+            if (this.cursor.right.isDown) {
+                playerSprite.body.velocity.x = 200;
+            }
+
+            if (this.cursor.up.isDown) {
+                playerSprite.body.velocity.y = -200;
+            }
+
+            if (this.cursor.down.isDown) {
+                playerSprite.body.velocity.y = 200;
+            }
+
+            if (this.input.keyboard.isDown(Phaser.Keyboard.PAGE_DOWN)) {
+            }
+
+            for (var i in this.mobiles) {
+                this.mobiles[i].update();
+            }
+
+            this.hud.update();
+        };
+
+        PhaserGameState.prototype.render = function () {
+            this.hud.render();
+            //var text = "Energy: ";
+            // var style = { font: "14px Arial", fill: "#ff0044", align: "center" };
+            //renderText(text: string, x: number, y: number, color?: string, font?: string): void;
+            // this.debug.renderText(text, 10, 10, 'black', '14px Arial');
+            //this.game.debug.renderSpriteCorners(this.player.Sprite, false, true);
+            //this.game.debug.renderSpriteInfo(this.player.Sprite, 20, 32);
+        };
+        return PhaserGameState;
+    })(Phaser.State);
+    Game.PhaserGameState = PhaserGameState;
+
+    var Hud = (function (_super) {
+        __extends(Hud, _super);
+        function Hud(game, state) {
+            _super.call(this, game, game.world, "Hud");
+
+            this.state = state;
+        }
+        Hud.prototype.update = function () {
+        };
+
+        Hud.prototype.render = function () {
+            var text = "In Range: " + Phaser.Math.roundTo(this.state.player.inRange).toString();
+            this.state.debug.renderText(text, 10, 10, 'black', '14px Arial');
+
+            var text = "Energy: " + Phaser.Math.roundTo(this.state.player.energy, -2).toString();
+            this.state.debug.renderText(text, 100, 10, 'black', '14px Arial');
+        };
+        return Hud;
+    })(Phaser.Group);
+
+    var Target = (function (_super) {
+        __extends(Target, _super);
+        function Target(x, y) {
+            this.Graphic = new EndGate.Graphics.Circle(x, y, Target._targetRadius, Target._targetBodyColor);
+
+            _super.call(this, this.Graphic.GetDrawBounds());
+
+            // Make a border around our base graphic
+            this.Graphic.Border(5, Target._targetColor);
+
+            // Add a vertical rectangle to the base graphic
+            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 5, 40, Target._targetColor));
+
+            // Add a horizontal rectangle to the base graphic
+            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 40, 5, Target._targetColor));
+        }
+        Target.prototype.Collided = function (data) {
+            // We cannot collide with other targets because all targets have static positions.  Adding a collidable with a static position to the
+            // CollisionManager will optimize collision detection AND prevent other static collidables from colliding with each other.
+            // Will remove the target from the collision manager
+            this.Dispose();
+
+            // Will remove the target from the scene (will no longer be drawn)
+            this.Graphic.Dispose();
+
+            _super.prototype.Collided.call(this, data);
+        };
+        Target._targetRadius = 30;
+        Target._targetColor = EndGate.Graphics.Color.Green;
+        Target._targetBodyColor = EndGate.Graphics.Color.Transparent;
+        return Target;
+    })(EndGate.Collision.Collidable);
 })(Game || (Game = {}));
 //# sourceMappingURL=final.js.map
