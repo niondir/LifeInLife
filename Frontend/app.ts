@@ -164,10 +164,19 @@ module Game {
 
         state:PhaserGameState;
 
+        energyBar:Phaser.Sprite;
+
         constructor(game: Phaser.Game, state:PhaserGameState) {
             super(game, game.world, "Hud");
 
             this.state = state;
+
+            this.energyBar = this.create(0, 0, 'energy_bar');
+            this.energyBar.cameraOffset = new Phaser.Point(200, 6);
+
+            this.energyBar.cropEnabled = true;
+            this.energyBar.crop = new Phaser.Rectangle(0, 0, this.energyBar.body.width, this.energyBar.body.height);
+            this.energyBar.fixedToCamera = true;
         }
 
         public update() {
@@ -179,6 +188,8 @@ module Game {
 
             var text = "Energy: " + Phaser.Math.roundTo(this.state.player.energy, -2).toString();
             this.state.debug.renderText(text, 100, 10, 'black', '14px Arial');
+
+            this.energyBar.crop.width = this.energyBar.body.width / 10 * this.state.player.energy;
         }
 
 

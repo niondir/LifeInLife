@@ -16,6 +16,7 @@ module Game {
     }
 
 
+    // TODO: Should be a sprite
     export class Player extends Mobile {
 
         private state:PhaserGameState;
@@ -30,8 +31,6 @@ module Game {
             this.Sprite = state.add.sprite(x, y, 'player');
             this.Sprite.body.collideWorldBounds = true;
             this.state = state;
-
-
 
             this.state.input.mouse.mouseDownCallback = <Function>((e) => this.mouseClick(e));
         }

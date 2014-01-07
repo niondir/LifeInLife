@@ -755,6 +755,7 @@ declare module Phaser {
         anchor: Phaser.Point;
         x: number;
         y: number;
+        cameraOffset:Phaser.Point;
         position: Phaser.Point;
         autoCull: boolean;
         scale: Phaser.Point;
@@ -773,7 +774,7 @@ declare module Phaser {
         frame: number;
         frameName: string;
         inCamera: boolean;
-        crop: boolean;
+        crop: Phaser.Rectangle;
         cropEnabled: boolean;
         inputEnabled: boolean;
         fixedToCamera:boolean;
