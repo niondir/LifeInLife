@@ -7,33 +7,24 @@
 window.onload = () => {
     var el = document.getElementById('gameCanvas');
     //var game = new Game.LifeInLife(<HTMLCanvasElement>el);
-    var game = new Game.PhaserGame();
+    var game = new Game.LifeInLifeGame();
 };
 
 module Game {
 
-    export class PhaserGame {
-        game:Phaser.Game;
-
-        constructor() {
-            var state = new PhaserGameState();
-            this.game = new LifeInLifeGame();
-
-        }
-
-    }
-
     export class LifeInLifeGame extends Phaser.Game {
         constructor() {
             super(800, 600, Phaser.CANVAS, 'content', null, true, true);
+            // TODO: Into: (Game of Life + Loading assets) Limited by loading screen but with min length
+            // TODO: Menu: Game of Life style
             this.state.add("Main", new PhaserGameState(), true);
+
+            // Esc -> Exit Dialog -> Menu/Cancel
         }
 
     }
 
     export class PhaserGameState extends Phaser.State {
-
-        //game:Phaser.Game;
         player:Player;
         private hud:Hud;
         cursor:Phaser.CursorKeys;
@@ -77,11 +68,11 @@ module Game {
 
             this.world.setBounds(0, 0, 2000, 2000);
 
-            this.npcs = new Phaser.Group(this.game, this.world, "npc's", false);
+            this.npcs = this.game.add.group(this.world, "npcs");
 
             for (var i = 0; i < 100; i++) {
-                var npc = new Npc(this.world.randomX, this.world.randomY, this);
-                this.npcs.add(npc.Sprite);
+                var npc = new Npc(this.game, this.world.randomX, this.world.randomY, this);
+                this.npcs.add(npc);
                 this.mobiles.push(<Mobile>npc);
             }
 
@@ -94,15 +85,15 @@ module Game {
                 Phaser.Keyboard.DOWN,
                 Phaser.Keyboard.SPACEBAR ]);
 
-            var player = new Player(this.world.centerX, this.world.centerY, this);
+            var player = new Player(this.game, this.world.centerX, this.world.centerY);
             this.player = player;
             this.mobiles.push(<Mobile>player);
 
-            this.camera.follow(this.player.Sprite, Phaser.Camera.FOLLOW_PLATFORMER);
+            this.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
         }
 
         update() {
-            var playerSprite = this.player.Sprite;
+            var playerSprite = this.player;
 
             playerSprite.body.velocity.x = 0;
             playerSprite.body.velocity.y = 0;
@@ -171,12 +162,21 @@ module Game {
 
             this.state = state;
 
-            this.energyBar = this.create(0, 0, 'energy_bar');
+            var bar = this.game.add.graphics(0, 0);
+            bar.lineStyle(2, 0x0000FF, 1);
+            bar.drawRect(50, 250, 100, 100);
+            this.add(bar);
+            this.energyBar = bar;
+
+
+           // this.energyBar = this.create(0, 0, 'energy_bar');
+
             this.energyBar.cameraOffset = new Phaser.Point(200, 6);
 
-            this.energyBar.cropEnabled = true;
-            this.energyBar.crop = new Phaser.Rectangle(0, 0, this.energyBar.body.width, this.energyBar.body.height);
+            //this.energyBar.cropEnabled = true;
+            //this.energyBar.crop = new Phaser.Rectangle(0, 0, this.energyBar.body.width, this.energyBar.body.height);
             this.energyBar.fixedToCamera = true;
+
         }
 
         public update() {
@@ -189,45 +189,10 @@ module Game {
             var text = "Energy: " + Phaser.Math.roundTo(this.state.player.energy, -2).toString();
             this.state.debug.renderText(text, 100, 10, 'black', '14px Arial');
 
-            this.energyBar.crop.width = this.energyBar.body.width / 10 * this.state.player.energy;
+            //this.energyBar.crop.width = this.energyBar.body.width / 10 * this.state.player.energy;
+
         }
 
 
     }
-
-
-    class Target extends EndGate.Collision.Collidable {
-        private static _targetRadius:number = 30;
-        private static _targetColor:EndGate.Graphics.Color = EndGate.Graphics.Color.Green;
-        private static _targetBodyColor:EndGate.Graphics.Color = EndGate.Graphics.Color.Transparent;
-
-        public Graphic:EndGate.Graphics.Circle;
-
-        constructor(x:number, y:number) {
-            this.Graphic = new EndGate.Graphics.Circle(x, y, Target._targetRadius, Target._targetBodyColor);
-
-            super(this.Graphic.GetDrawBounds());
-
-            // Make a border around our base graphic
-            this.Graphic.Border(5, Target._targetColor);
-            // Add a vertical rectangle to the base graphic
-            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 5, 40, Target._targetColor));
-            // Add a horizontal rectangle to the base graphic
-            this.Graphic.AddChild(new EndGate.Graphics.Rectangle(0, 0, 40, 5, Target._targetColor));
-        }
-
-        public Collided(data:EndGate.Collision.CollisionData):void {
-            // We cannot collide with other targets because all targets have static positions.  Adding a collidable with a static position to the
-            // CollisionManager will optimize collision detection AND prevent other static collidables from colliding with each other.
-
-            // Will remove the target from the collision manager
-            this.Dispose();
-            // Will remove the target from the scene (will no longer be drawn)
-            this.Graphic.Dispose();
-
-            super.Collided(data);
-        }
-    }
-
-
 }

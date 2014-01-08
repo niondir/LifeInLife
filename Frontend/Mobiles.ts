@@ -3,13 +3,23 @@
 module Game {
 
     export interface IMobile {
-        Sprite:Phaser.Sprite;
-
         update();
     }
 
-    export class Mobile implements IMobile {
-        public Sprite:Phaser.Sprite;
+    export class Mobile extends Phaser.Sprite implements IMobile {
+        state:PhaserGameState;
+
+        constructor(game: Phaser.Game, x?: number, y?: number, key?: string, frame?: number) {
+            super(game, x, y, key, frame);
+
+            if(game.state.states[game.state.current] instanceof  PhaserGameState) {
+                this.state = <PhaserGameState>game.state.states[game.state.current];
+            }
+            else {
+                console.error("ERROR: state is not of type PhaserGameState");
+            }
+
+        }
 
         update() {
         }
@@ -19,20 +29,19 @@ module Game {
     // TODO: Should be a sprite
     export class Player extends Mobile {
 
-        private state:PhaserGameState;
+
         private energyPerSec:number = 1;
 
         public inRange:number = 0;
         public energy:number = 10;
 
 
-        constructor(x:number, y:number, state:PhaserGameState) {
-            super();
-            this.Sprite = state.add.sprite(x, y, 'player');
-            this.Sprite.body.collideWorldBounds = true;
-            this.state = state;
+        constructor(game: Phaser.Game, x:number, y:number) {
+            super(game, x, y, 'player' );
+            this.body.collideWorldBounds = true;
+            this.anchor.setTo(0.5, 0.5);
 
-            this.state.input.mouse.mouseDownCallback = <Function>((e) => this.mouseClick(e));
+            this.game.input.mouse.mouseDownCallback = <Function>((e) => this.mouseClick(e));
         }
 
         public mouseClick(event:MouseEvent) {
@@ -42,7 +51,7 @@ module Game {
         public update() {
             this.inRange = this.countInRange();
 
-            var elapsedSec = this.state.time.elapsed / 1000;
+            var elapsedSec = this.game.time.elapsed / 1000;
             this.gainEnergy(elapsedSec);
         }
 
@@ -61,13 +70,13 @@ module Game {
         }
 
         public bubbleText(msg:string) {
-            var body = this.Sprite.body;
+            var body = this.body;
 
-            var text = this.state.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
-            var moveTween = this.state.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
-            var hideTween = this.state.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
+            var text = this.game.add.bitmapText(body.x, body.y - 30, msg, { font: '28px Desyrel', align: 'center' });
+            var moveTween = this.game.add.tween(text).to({ y: body.y - 80 }, 1000, Phaser.Easing.Cubic.Out, true);
+            var hideTween = this.game.add.tween(text).to({ alpha: 0 }, 200, Phaser.Easing.Quadratic.InOut, true, 500);
 
-            hideTween.onComplete.addOnce(() => {this.state.world.remove(text)});
+            hideTween.onComplete.addOnce(() => {this.game.world.remove(text)});
         }
 
         public get energyGainPerSec():number {
@@ -83,10 +92,10 @@ module Game {
         }
 
         private countInRange():number {
-            var player = this.state.player.Sprite.center;
+            var player = this.state.player.center;
             var count = 0;
             for (var i in this.state.mobiles) {
-                var mob = this.state.mobiles[i].Sprite.center;
+                var mob = this.state.mobiles[i].center;
 
                 var dist = Phaser.Math.distance(player.x, player.y, mob.x, mob.y);
                 if (mob != player && dist < 100) {
@@ -98,22 +107,21 @@ module Game {
     }
 
     export class Npc extends Mobile {
-        private state:PhaserGameState;
 
         // Energy Emitter
         private emitterRed:Phaser.Particles.Arcade.Emitter;
         private emitterYellow:Phaser.Particles.Arcade.Emitter;
         private emitterGreen:Phaser.Particles.Arcade.Emitter;
 
-        constructor(x:number, y:number, state:PhaserGameState) {
-            super();
+        constructor(game:Phaser.Game, x:number, y:number, state:PhaserGameState) {
+            super(game, x, y, 'target');
             this.state = state;
 
-            this.Sprite = state.add.sprite(x, y, 'target');
-            this.Sprite.body.collideWorldBounds = true;
-            this.Sprite.body.velocity.x = this.state.game.rnd.frac() * 100;
-            this.Sprite.body.velocity.y = this.state.game.rnd.frac() * 100;
-            this.Sprite.body.bounce.setTo(1, 1);
+            this.body.collideWorldBounds = true;
+            this.body.velocity.x = this.state.game.rnd.frac() * 100;
+            this.body.velocity.y = this.state.game.rnd.frac() * 100;
+            this.body.bounce.setTo(1, 1);
+            this.anchor.setTo(0.5, 0.5);
 
             this.emitterGreen = this.buildEmitter('energy_green');
             this.emitterYellow = this.buildEmitter('energy_yellow');
@@ -123,13 +131,13 @@ module Game {
         }
 
         buildEmitter(sprite:string) {
-            var emitter = this.state.add.emitter(this.Sprite.x, this.Sprite.y, 100);
+            var emitter = this.state.add.emitter(this.x, this.y, 100);
             emitter.gravity = 0;
             //keys: string[], frames: string[], quantity: number, collide: boolean, collideWorldBounds: boolean
 
             emitter.makeParticles([sprite], [], 2, false, false);
-            emitter.x = this.Sprite.x;
-            emitter.y = this.Sprite.y;
+            emitter.x = this.x;
+            emitter.y = this.y;
             emitter.minParticleScale = 2;
             emitter.maxParticleScale = 2;
             emitter.start(false, 2000, 100, 0);
@@ -138,14 +146,14 @@ module Game {
         }
 
         public update() {
-            this.emitterRed.x = this.Sprite.x;
-            this.emitterRed.y = this.Sprite.y;
-            this.emitterYellow.x = this.Sprite.x;
-            this.emitterYellow.y = this.Sprite.y;
-            this.emitterGreen.x = this.Sprite.x;
-            this.emitterGreen.y = this.Sprite.y;
+            this.emitterRed.x = this.x;
+            this.emitterRed.y = this.y;
+            this.emitterYellow.x = this.x;
+            this.emitterYellow.y = this.y;
+            this.emitterGreen.x = this.x;
+            this.emitterGreen.y = this.y;
 
-            var inRange = this.state.physics.distanceBetween(this.Sprite, this.state.player.Sprite) < 100;
+            var inRange = this.state.physics.distanceBetween(this, this.state.player) < 100;
 
             this.emitterRed.on = false;
             this.emitterYellow.on = false;
@@ -168,16 +176,12 @@ module Game {
         }
 
         moveTo(sprite:Phaser.Sprite) {
-
-
-            if (this.state.physics.distanceBetween(sprite, this.state.player.Sprite) < 10) {
+            if (this.state.physics.distanceBetween(sprite, this.state.player) < 10) {
                 sprite.kill();
                 return;
             }
 
-            this.state.physics.moveToObject(sprite, this.state.player.Sprite, 500);
-
-
+            this.state.physics.moveToObject(sprite, this.state.player, 500);
         }
     }
 }
