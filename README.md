@@ -12,7 +12,10 @@ EndGate code is obsolete. It was a proov of concept. I decided to continue with 
 
 
 Rules (concept)
-=====
+-----
+
+### Energy
+
 Cells that Gain/Loose energy based on neighbours
 
 * < 2 : Loose
@@ -31,6 +34,7 @@ Similar to Conways Game of Life:
 Having 3 cells/spawns together will place an invisible spawn in the center. The spawn gets/loose energie like a cell. When reaching 5 energy it spawns a cell (with arbitary AI? and initial energy). Having 0 Energy will kill the spawn again. Other spawns will be counted as neighbours for spawns only.
 
 
+### Evolution
 Cells have evolution phases.
 
 * A cell with <= 0 energy will evolve back till phase 0.
