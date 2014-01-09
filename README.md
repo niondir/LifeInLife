@@ -24,7 +24,7 @@ Cells that Gain/Loose energy based on neighbours
 * 4  : Keep
 * \> 4 : Loose
 
-Similar to Conways Game of Life:
+Similar to [Conways Game of Life](http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life):
 * < 2 : Die
 * 2-3 : Survive
 * > 3 : Die
