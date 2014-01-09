@@ -30,6 +30,7 @@ Similar to [Conways Game of Life](http://en.wikipedia.org/wiki/Conway%27s_Game_o
 * > 3 : Die
 * = 3 : Spawn
 
+#### Spawn new Cells
 
 Having 3 cells/spawns together will place an invisible spawn in the center. The spawn gets/loose energie like a cell. When reaching 5 energy it spawns a cell (with arbitary AI? and initial energy). Having 0 Energy will kill the spawn again. Other spawns will be counted as neighbours for spawns only.
 
