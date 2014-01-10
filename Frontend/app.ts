@@ -64,7 +64,7 @@ module Game {
         }
 
         create() {
-            this.spawnSystem = new Game.SpawnSystem(this.componentManager);
+            this.spawnSystem = new Game.SpawnSystem(this.game, this.componentManager);
 
             this.cameraAnchor = this.add.sprite(0, 0, 'empty');
             this.cameraAnchor.fixedToCamera = true;
@@ -84,9 +84,10 @@ module Game {
             }
 
 
-            var spawn = new Spawn(this.game, () => {});
+            var spawn = new Spawn();
             spawn.spawnDelaySec = 5;
-            spawn.start();
+            spawn.started = this.game.time.elapsed;
+            spawn.active = true;
             var spawnerEntity = new SpawnerEntity(spawn);
             // TODO: also support "late registering"
             this.componentManager.register(spawnerEntity);
@@ -145,6 +146,7 @@ module Game {
              }
              */
 
+            // STC: Yet we have to manage all systems here manually. Might be the most flexible solution, but maybe not
             this.spawnSystem.update();
         }
 
@@ -190,7 +192,6 @@ module Game {
             //this.energyBar.cropEnabled = true;
             //this.energyBar.crop = new Phaser.Rectangle(0, 0, this.energyBar.body.width, this.energyBar.body.height);
             this.energyBar.fixedToCamera = true;
-
         }
 
         public update() {

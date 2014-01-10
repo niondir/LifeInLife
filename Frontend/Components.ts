@@ -7,21 +7,25 @@ module Game {
 
     export class ComponentManager {
         entities:Array<IEntity> = [];
-        components:Map<string, Array<IEntity>> = new Map<string, Array<IEntity>>();
-       // components: { [component: string]: IEntity; } = { };
+
+        // Maybe possible in ES6 ?
+        //components:Map<string, Array<IEntity>> = new Map<string, Array<IEntity>>();
+        components: { [component: string]: Array<IEntity>; } = { };
 
         public getEntitiesWith(componentType:string) : Array<IEntity> {
             return this.components[componentType];
         }
 
+        // TODO: our cache will not be accurate, if you add a entity before it has all it's components!
         public register(entity:IEntity) {
             this.entities.push(entity);
             for (var i in entity.components) {
                  var component = <IComponent>entity.components[i];
-                if (!this.components.has[component.getType()]) {
-                    this.components.set(component.getType(), new Array<IEntity>());
+
+                if (this.components[component.getType()] == undefined) {
+                    this.components[component.getType()] = new Array<IEntity>();
                 }
-                this.components.set[component.getType()].push(entity);
+                this.components[component.getType()].push(entity);
             }
         }
     }
@@ -30,48 +34,16 @@ module Game {
         getType(): string;
     }
 
-// TODO: Find/Create a Phaser Interface with the usual update/render/etc. functions and implement it
-    export class Component implements IComponent {
-        game:Phaser.Game;
-        getType():string {
-            return 'undefined';
-        }
-
-        constructor(game:Phaser.Game) {
-            this.game = game;
-        }
-
-        update(entity:Entity) {
-        }
-    }
-
-    export class Spawn extends Component {
+    export class Spawn implements IComponent {
         getType():string {
             return 'Spawn';
         }
 
-        private onSpawn:Function
-        private started:number;
+        started:number;
+        spawnDelaySec:number = 0;
+        active:boolean = false;
 
-        public spawnDelaySec:number = 0;
-        public active:boolean = false;
-
-        constructor(game:Phaser.Game, onSpawn:Function) {
-            super(game);
-            this.onSpawn = onSpawn;
-        }
-
-        public start() {
-            this.started = this.game.time.elapsed;
-            this.active = true;
-        }
-
-        update() {
-            if (!this.active) return;
-            if (this.started != null && this.game.time.elapsedSecondsSince(this.started) > this.spawnDelaySec) {
-                console.info("spawn!");
-                this.active = false;
-            }
+        constructor() {
         }
     }
 }

@@ -9,7 +9,7 @@ module Game {
 
     }
 
-    export class System implements ISystem {
+    export class System<T> implements ISystem {
         components:ComponentManager;
         componentMatchType:string;
 
@@ -22,27 +22,32 @@ module Game {
         }
 
         update() {
-            var matches = this.getEntities();
-            for(var i in matches) {
-                this.updateComponent(matches[i], matches[i].getComponent(this.componentMatchType));
+            var entities = this.getEntities();
+            for(var i in entities) {
+                this.updateComponent(entities[i], entities[i].getComponent(this.componentMatchType));
             }
         }
 
-        updateComponent(entity:IEntity, component:IComponent) {
+        updateComponent(entity:IEntity, component:T) {
         }
     }
 
-    export class SpawnSystem extends System {
-
-        constructor(components:ComponentManager) {
+    export class SpawnSystem extends System<Spawn> {
+        game:Phaser.Game;
+        constructor(game:Phaser.Game, components:ComponentManager) {
             super(components);
 
+            this.game = game;
             this.componentMatchType = 'Spawn';
             // maybe we want to know what components we want to see to save the check in the update function
         }
 
-        updateComponent(entity:IEntity, component:IComponent) {
-
+        updateComponent(entity:IEntity, c:Spawn) {
+            if (!c.active) return;
+            if (c.started != null && this.game.time.elapsedSecondsSince(c.started) > c.spawnDelaySec) {
+                console.info("spawn!");
+                c.active = false;
+            }
         }
     }
 
