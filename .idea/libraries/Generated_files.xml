@@ -2,7 +2,12 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/Frontend/Entities.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/Items.js" />
         <item url="file://$PROJECT_DIR$/Frontend/app.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/Components.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/Systems.js" />
+        <item url="file://$PROJECT_DIR$/Frontend/Events.js" />
         <item url="file://$PROJECT_DIR$/Frontend/Mobiles.js" />
       </sourceFilesUrls>
     </properties>
@@ -11,7 +16,12 @@
       <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/VerletManager.js" />
       <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/DistanceConstraint.js" />
       <root url="file://$PROJECT_DIR$/Frontend/phaser/phaser-master/wip/verlet/AngleConstraint.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/Entities.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/Items.js" />
       <root url="file://$PROJECT_DIR$/Frontend/app.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/Components.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/Events.js" />
+      <root url="file://$PROJECT_DIR$/Frontend/Systems.js" />
       <root url="file://$PROJECT_DIR$/Frontend/Mobiles.js" />
     </CLASSES>
     <SOURCES />

@@ -1,6 +1,8 @@
 ///<reference path="Events.ts"/>
-///<reference path="Keyboard.ts"/>
 ///<reference path="Mobiles.ts"/>
+///<reference path="Components.ts"/>
+///<reference path="Entities.ts"/>
+///<reference path="Systems.ts"/>
 ///<reference path="endgate/endgate-0.2.1.d.ts"/>
 ///<reference path="phaser/phaser.d.ts"/>
 
@@ -28,6 +30,9 @@ module Game {
         player:Player;
         private hud:Hud;
         cursor:Phaser.CursorKeys;
+
+        componentManager:ComponentManager = new ComponentManager();
+        spawnSystem:SpawnSystem;
 
         public get debug():Phaser.Utils.Debug {
             return this.game.debug;
@@ -59,6 +64,8 @@ module Game {
         }
 
         create() {
+            this.spawnSystem = new Game.SpawnSystem(this.componentManager);
+
             this.cameraAnchor = this.add.sprite(0, 0, 'empty');
             this.cameraAnchor.fixedToCamera = true;
 
@@ -77,6 +84,15 @@ module Game {
             }
 
 
+            var spawn = new Spawn(this.game, () => {});
+            spawn.spawnDelaySec = 5;
+            spawn.start();
+            var spawnerEntity = new SpawnerEntity(spawn);
+            // TODO: also support "late registering"
+            this.componentManager.register(spawnerEntity);
+
+
+
             //  Stop the following keys from propagating up to the browser
             this.input.keyboard.addKeyCapture([
                 Phaser.Keyboard.LEFT,
@@ -91,6 +107,8 @@ module Game {
 
             this.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
         }
+
+
 
         update() {
             var playerSprite = this.player;
@@ -126,12 +144,8 @@ module Game {
              this.game.input.mousePointer.reset();
              }
              */
-            for (var i in this.mobiles) {
-                this.mobiles[i].update();
-            }
 
-            this.hud.update();
-
+            this.spawnSystem.update();
         }
 
         render() {

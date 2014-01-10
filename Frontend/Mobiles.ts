@@ -42,6 +42,7 @@ module Game {
             this.anchor.setTo(0.5, 0.5);
 
             this.game.input.mouse.mouseDownCallback = <Function>((e) => this.mouseClick(e));
+            this.game.add.existing(this);
         }
 
         public mouseClick(event:MouseEvent) {
