@@ -106,6 +106,11 @@ module Game {
             this.player = player;
             this.mobiles.push(<Mobile>player);
 
+            var playerEntity = new Entity();
+            playerEntity.addComponent(new Sprite(player));
+            playerEntity.addComponent(new NeighbourCount(this.npcs));
+            this.componentManager.register(playerEntity);
+
             this.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
         }
 
@@ -148,6 +153,7 @@ module Game {
 
             // STC: Yet we have to manage all systems here manually. Might be the most flexible solution, but maybe not
             this.spawnSystem.update();
+            new CountNeighboursSystem(this.game, this.componentManager).update();
         }
 
         render() {

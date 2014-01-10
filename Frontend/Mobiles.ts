@@ -28,8 +28,6 @@ module Game {
 
     // TODO: Should be a sprite
     export class Player extends Mobile {
-
-
         private energyPerSec:number = 1;
 
         public inRange:number = 0;
